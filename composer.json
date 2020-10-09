@@ -1,0 +1,41 @@
+{
+    "name": "stevep/frameworkless",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Steve Pavarno",
+            "email": "pavarnos@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Frameworkless\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Frameworkless\\": "test/src/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "prefer-stable": true,
+    "require": {
+        "php": ">=7.4",
+        "ext-json": "*",
+        "lss/yacontainer": "dev-master",
+        "monolog/monolog": "^2.1"
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^0.12.28",
+        "phpstan/phpstan-phpunit": "^0.12.11",
+        "phpstan/phpstan-strict-rules": "^0.12.2",
+        "phpunit/phpunit": "^9.2",
+        "thecodingmachine/phpstan-safe-rule": "^1.0"
+    },
+    "scripts": {
+        "test": "./vendor/bin/phpunit",
+        "phpstan": "vendor/bin/phpstan analyse -c phpstan.neon"
+    }
+}

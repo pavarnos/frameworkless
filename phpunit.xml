@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true" convertWarningsToExceptions="true"
+         beStrictAboutTestsThatDoNotTestAnything="true"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
+    <coverage processUncoveredFiles="true">
+        <include>
+            <directory suffix=".php">./src</directory>
+        </include>
+    </coverage>
+    <testsuites>
+        <testsuite name="All Tests">
+            <directory>./test/src</directory>
+        </testsuite>
+    </testsuites>
+    <php>
+        <ini name="zend.assertions" value="1"/>
+        <ini name="assert.exception" value="1"/>
+        <ini name="display_errors" value="1"/>
+        <ini name="display_startup_errors" value="1"/>
+        <const name="UNIT_TEST" value="true"/>
+        <server name="SERVER_ADDR" value="127.0.0.1"/>
+        <server name="REMOTE_ADDR" value="127.0.0.1"/>
+        <server name="SERVER_NAME" value="unittest.dev"/>
+        <server name="SERVER_PORT" value="443"/>
+        <server name="DOCUMENT_ROOT" value="./public"/>
+    </php>
+</phpunit>

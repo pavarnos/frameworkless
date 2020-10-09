@@ -1,0 +1,18 @@
+#
+# vagrant specific configuration for mysql
+#
+# see also https://www.barrykooij.com/connect-mysql-vagrant-machine/
+[client]
+default-character-set=utf8mb4
+
+[mysqld]
+character-set-server=utf8mb4
+collation-server=utf8mb4_unicode_ci
+default-authentication-plugin=mysql_native_password
+
+# local socket only
+
+# for local development
+# skip-networking
+# may need to edit /etc/mysql/mysql.conf.d/mysql.cnf and comment out bind-address=127.0.0.1
+bind-address=192.168.33.16

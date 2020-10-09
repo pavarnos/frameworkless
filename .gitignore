@@ -1,0 +1,11 @@
+/vendor/
+/cache/*
+/public/assets/build
+/.vagrant
+ubuntu*.log
+/.env
+phpstan.log
+.phpunit.result.cache
+/node_modules
+/tools
+/.phive
