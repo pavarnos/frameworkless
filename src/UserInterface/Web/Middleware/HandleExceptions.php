@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Frameworkless\UserInterface\Web\Middleware;
 
-use Frameworkless\Environment;
 use Frameworkless\UserInterface\Web\HttpUtilities;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -41,23 +40,7 @@ class HandleExceptions implements MiddlewareInterface
             } catch (\PDOException $ex) {
                 // have to ignore it: unrecoverable
             }
-            $code = $exception->getCode() ?: HttpUtilities::STATUS_INTERNAL_SERVER_ERROR;
-            return HttpUtilities::htmlResponse($this->formatError($exception), $code);
-            // Chrome requires the content length to be exact for non 200 responses, but xdebug may have injected some extra html
-            // so we can't use a 500 server error status here
+            return HttpUtilities::errorResponse($request, $exception);
         }
-    }
-
-    private function formatError(\Throwable $exception): string
-    {
-        $body = '<html lang="en"><body>';
-        $body .= '<h1>Server Error</h1>';
-        $body .= '<p>System administrators have been notified. Please try again later.</p>';
-        if (Environment::isDebug()) {
-            $body .= '<p>' . $exception->getMessage() . '</p>';
-            $body .= '<pre>' . $exception->getTraceAsString() . '</pre>';
-        }
-        $body .= '</body></html>';
-        return $body;
     }
 }

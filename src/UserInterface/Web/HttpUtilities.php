@@ -11,7 +11,7 @@ namespace Frameworkless\UserInterface\Web;
 
 use Fig\Http\Message\RequestMethodInterface;
 use Fig\Http\Message\StatusCodeInterface;
-use Frameworkless\UserInterface\Web\Middleware\JwtAuthMiddleware;
+use Frameworkless\Environment;
 use Narrowspark\MimeType\MimeTypeExtensionGuesser;
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
@@ -22,6 +22,11 @@ final class HttpUtilities implements StatusCodeInterface, RequestMethodInterface
     private const MAX_AGE           = 60 * 60 * 24 * 365;
     private const DEFAULT_MIME_TYPE = 'application/octet-stream';
 
+    private const CONTENT_TYPE = [
+        'html' => ['text/html', 'application/xhtml+xml'],
+        'json' => ['application/json', 'text/json', 'application/x-json'],
+    ];
+
     public static function htmlResponse(string $content, int $status = self::STATUS_OK): ResponseInterface
     {
         return new Response($status, ['Content-Type' => 'text/html'], $content);
@@ -30,6 +35,57 @@ final class HttpUtilities implements StatusCodeInterface, RequestMethodInterface
     public static function jsonResponse(array $content, int $status = self::STATUS_OK): ResponseInterface
     {
         return new Response($status, ['Content-Type' => 'application/json'], \Safe\json_encode($content));
+    }
+
+    public static function htmlErrorResponse(\Throwable $exception): ResponseInterface
+    {
+        $body = '<html lang="en"><body>';
+        $body .= '<h1>Server Error</h1>';
+        $body .= '<p>System administrators have been notified. Please try again later.</p>';
+        if (Environment::isDebug()) {
+            $body .= '<p>' . $exception->getMessage() . '</p>';
+            $body .= '<pre>' . $exception->getTraceAsString() . '</pre>';
+        }
+        $body .= '</body></html>';
+        $code = $exception->getCode() ?: HttpUtilities::STATUS_INTERNAL_SERVER_ERROR;
+        // Chrome requires the content length to be exact for non 200 responses, but xdebug may have injected some extra html
+        // so we can't always use a 500 server error status here
+        return self::htmlResponse($body, $code);
+    }
+
+    public static function jsonErrorResponse(\Throwable $exception): ResponseInterface
+    {
+        $content = [
+            'error' => $exception->getMessage(),
+            'code'  => $exception->getCode() ?: HttpUtilities::STATUS_INTERNAL_SERVER_ERROR,
+        ];
+        if (Environment::isDebug()) {
+            $content['trace'] = $exception->getTrace();
+        }
+        return self::jsonResponse($content, $content['code']);
+    }
+
+    public static function errorResponse(ServerRequestInterface $request, \Throwable $exception): ResponseInterface
+    {
+        $type = HttpUtilities::getContentType($request);
+        return $type === 'json'
+            ? HttpUtilities::jsonErrorResponse($exception)
+            : HttpUtilities::htmlErrorResponse($exception);
+    }
+
+    public static function getContentType(ServerRequestInterface $request, string $default = 'json'): string
+    {
+        // find the first known content type that the caller will Accept
+        $accepts = explode(',', strtolower($request->getHeaderLine('Accept')));
+        foreach ($accepts as $accept) {
+            [$accept,] = explode(';', $accept);
+            foreach (self::CONTENT_TYPE as $name => $mimeTypes) {
+                if (in_array($accept, $mimeTypes)) {
+                    return $name;
+                }
+            }
+        }
+        return $default;
     }
 
     public static function staticFileResponse(string $diskPath): ResponseInterface
@@ -72,11 +128,6 @@ final class HttpUtilities implements StatusCodeInterface, RequestMethodInterface
             $taintedValue = '';
         }
         return max(0, (int)filter_var($taintedValue, FILTER_SANITIZE_NUMBER_INT));
-    }
-
-    public static function getJwtUserId(ServerRequestInterface $request): int
-    {
-        return self::sanitiseInteger($request->getAttribute(JwtAuthMiddleware::USER_ID, 0));
     }
 
     private static function calculateMimeType(string $path): string

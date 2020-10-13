@@ -20,8 +20,8 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class JwtAuthMiddleware implements MiddlewareInterface
 {
-    private const BASE_URL    = '/api/vi/';
-    private const IGNORE      = [self::BASE_URL . 'login'];
+    private const BASE_URL = '/api/';
+    private const IGNORE   = [self::BASE_URL . 'v1/login'];
 
     private const HEADER      = 'Authorization';
     private const TOKEN_REGEX = '/^Bearer\s+(.*)$/i';
@@ -30,29 +30,38 @@ class JwtAuthMiddleware implements MiddlewareInterface
     public const NOT_LOGGED_IN = 'Not logged in';
     public const USER_ID       = 'user_id';
 
+    public static function getUserId(ServerRequestInterface $request): int
+    {
+        return HttpUtilities::sanitiseInteger($request->getAttribute(self::USER_ID, 0));
+    }
+
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $uri = $request->getUri()->getPath();
-        if (!str_starts_with($uri, self::BASE_URL)) {
+        if (!$this->shouldHaveToken($request)) {
             return $handler->handle($request);
-        }
-        foreach (self::IGNORE as $ignore) {
-            if ($uri === $ignore) {
-                return $handler->handle($request);
-            }
         }
         $token = $this->fetchToken($request);
         try {
-            $payload = (array)JWT::decode($token, Environment::getAppSecret());
+            $payload = (array)JWT::decode($token, Environment::getAppSecret(), ['HS256']);
             $userId  = intval($payload['sub'] ?? 0);
-            if (empty($userId)) {
-                // belt and braces: 'sub' should always be set if the token was issued / signed by us
-                throw new HttpException(self::NOT_LOGGED_IN, HttpUtilities::STATUS_UNAUTHORIZED);
-            }
             return $handler->handle($request->withAttribute(self::USER_ID, $userId));
         } catch (\Throwable $ex) {
-            throw new HttpException(self::NOT_LOGGED_IN, HttpUtilities::STATUS_UNAUTHORIZED);
+            throw new HttpException(self::NOT_LOGGED_IN, HttpUtilities::STATUS_UNAUTHORIZED, $ex);
         }
+    }
+
+    private function shouldHaveToken(ServerRequestInterface $request): bool
+    {
+        $uri = $request->getUri()->getPath();
+        if (!str_starts_with($uri, self::BASE_URL)) {
+            return false;
+        }
+        foreach (self::IGNORE as $ignore) {
+            if ($uri === $ignore) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private function fetchToken(ServerRequestInterface $request): string

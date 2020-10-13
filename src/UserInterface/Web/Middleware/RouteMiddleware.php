@@ -46,14 +46,14 @@ class RouteMiddleware implements MiddlewareInterface
         if (!$this->container->has($className)) {
             throw new HttpException('Page does not exist', HttpUtilities::STATUS_NOT_FOUND);
         }
-        $method     = strtolower($request->getMethod());
-        $controller = $this->container->get($className); // abstract classes and interfaces will throw exception
-        if ($method === HttpUtilities::METHOD_GET && $controller instanceof HandlesGetRequest) {
-            return $controller->getMethod($request);
+        $method = strtoupper($request->getMethod());
+        $action = $this->container->get($className); // abstract classes and interfaces will throw exception
+        if ($method === HttpUtilities::METHOD_GET && $action instanceof HandlesGetRequest) {
+            return $action->getMethod($request);
         }
-        if ($method === HttpUtilities::METHOD_POST && $controller instanceof HandlesPostRequest) {
-            return $controller->postMethod($request);
+        if ($method === HttpUtilities::METHOD_POST && $action instanceof HandlesPostRequest) {
+            return $action->postMethod($request);
         }
-        throw new HttpException('Page does not allow ' . $method, HttpUtilities::STATUS_NOT_FOUND);
+        throw new HttpException($method . ' not allowed', HttpUtilities::STATUS_NOT_FOUND);
     }
 }

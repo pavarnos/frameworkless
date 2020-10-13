@@ -10,12 +10,21 @@ declare(strict_types=1);
 namespace Frameworkless;
 
 use Frameworkless\UserInterface\Web\Middleware\HandleExceptions;
+use Frameworkless\UserInterface\Web\Middleware\JwtAuthMiddleware;
+use Frameworkless\UserInterface\Web\Middleware\ParseBodyMiddleware;
+use Frameworkless\UserInterface\Web\Middleware\ProfileMiddleware;
+use Frameworkless\UserInterface\Web\Middleware\RouteMiddleware;
 use Frameworkless\UserInterface\Web\MiddlewareDispatcher;
 use LSS\YAContainer\Container;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogHandler;
 use Monolog\Logger;
+use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ServerRequestFactoryInterface;
+use Psr\Http\Message\StreamFactoryInterface;
+use Psr\Http\Message\UploadedFileFactoryInterface;
+use Psr\Http\Message\UriFactoryInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -25,6 +34,10 @@ class ContainerBuilder
 {
     /** @var array interface name => actual class to return. These all have auto wired constructors */
     private const ALIAS = [
+        ServerRequestFactoryInterface::class => Psr17Factory::class,
+        UriFactoryInterface::class           => Psr17Factory::class,
+        UploadedFileFactoryInterface::class  => Psr17Factory::class,
+        StreamFactoryInterface::class        => Psr17Factory::class,
     ];
 
     public function build(): ContainerInterface
@@ -47,7 +60,12 @@ class ContainerBuilder
 
         $container->addFactory(
             MiddlewareDispatcher::class,
-            fn(LoggerInterface $logger) => (new MiddlewareDispatcher())->add(new HandleExceptions($logger))
+            fn(LoggerInterface $logger) => (new MiddlewareDispatcher())
+                ->add(new RouteMiddleware($container))
+                ->add(new JwtAuthMiddleware())
+                ->add(new ParseBodyMiddleware())
+                ->add(new HandleExceptions($logger))
+                ->add(new ProfileMiddleware())
         );
         return $container;
     }

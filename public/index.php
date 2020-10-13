@@ -7,8 +7,10 @@
 
 declare(strict_types=1);
 
+require '../vendor/autoload.php';
+
 use Frameworkless\ContainerBuilder;
-use Frameworkless\Http\MiddlewareDispatcher;
+use Frameworkless\UserInterface\Web\MiddlewareDispatcher;
 use Nyholm\Psr7Server\ServerRequestCreator;
 use Narrowspark\HttpEmitter\SapiEmitter;
 

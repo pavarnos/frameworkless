@@ -11,6 +11,7 @@ namespace Frameworkless\UserInterface\Web\Action\Api\v1;
 
 use Frameworkless\UserInterface\Web\HandlesGetRequest;
 use Frameworkless\UserInterface\Web\HttpUtilities;
+use Frameworkless\UserInterface\Web\Middleware\JwtAuthMiddleware;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -21,7 +22,7 @@ class HelloAction implements HandlesGetRequest
         return HttpUtilities::jsonResponse(
             [
                 'hello'   => 'world',
-                'user_id' => HttpUtilities::getJwtUserId($request),
+                'user_id' => JwtAuthMiddleware::getUserId($request),
             ]
         );
     }

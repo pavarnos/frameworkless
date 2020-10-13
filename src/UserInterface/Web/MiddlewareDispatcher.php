@@ -15,10 +15,13 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 /**
- * the final / innermost middleware should always return a response
+ * ->add() middleware inner first, then outer.
+ * the first / innermost middleware should always return a response or you will get an exception
  */
 class MiddlewareDispatcher implements RequestHandlerInterface
 {
+    public const ERROR_MESSAGE = 'No handler for middleware';
+
     /** @var MiddlewareInterface[] */
     private array $middleware = [];
 
@@ -31,7 +34,7 @@ class MiddlewareDispatcher implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         if (empty($this->middleware)) {
-            throw new HttpException('No handler for middleware');
+            throw new HttpException(self::ERROR_MESSAGE);
         }
         $middleware = array_pop($this->middleware);
         assert(!is_null($middleware)); // for phpstan

@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use Firebase\JWT\JWT;
 use Frameworkless\Environment;
 use Frameworkless\UserInterface\Web\HandlesPostRequest;
+use Frameworkless\UserInterface\Web\HttpException;
 use Frameworkless\UserInterface\Web\HttpUtilities;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -22,13 +23,11 @@ class LoginAction implements HandlesPostRequest
     public function postMethod(ServerRequestInterface $request): ResponseInterface
     {
         // find the user
-        $userName = HttpUtilities::sanitiseRequestText($request, 'username');
-        $password = HttpUtilities::sanitiseRequestText($request, 'password');
+        $body     = $request->getParsedBody();
+        $userName = HttpUtilities::sanitiseText($body['username'] ?? '');
+        $password = HttpUtilities::sanitiseText($body['password'] ?? '');
         if ($userName !== 'foo@example.com' || $password !== 'password') {
-            return HttpUtilities::jsonResponse(
-                ['error' => 'Invalid username or password'],
-                HttpUtilities::STATUS_UNAUTHORIZED
-            );
+            throw new HttpException('Invalid username or password', HttpUtilities::STATUS_UNAUTHORIZED);
         }
         $userId = 123;
 
@@ -47,6 +46,7 @@ class LoginAction implements HandlesPostRequest
             [
                 'token'   => JWT::encode($payload, Environment::getAppSecret()),
                 'expires' => $expires,
+//                'user'    => ['id' => $userId],
             ]
         );
     }

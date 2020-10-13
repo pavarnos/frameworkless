@@ -90,7 +90,7 @@ Vagrant.configure(2) do |config|
         sudo phpenmod curl dom
 
         # debug / development tools
-        sudo apt-get install -y php-xdebug
+        sudo apt-get install -y php7.4-xdebug
 
         sudo apt install -y apache2
         sudo a2dismod -q -f autoindex
