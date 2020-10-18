@@ -23,6 +23,7 @@
     "prefer-stable": true,
     "require": {
         "php": ">=7.4",
+        "ext-apcu": "*",
         "ext-json": "*",
         "ext-pdo": "*",
         "components/jquery": "^3.5",

@@ -7,10 +7,10 @@
 
 declare(strict_types=1);
 
-namespace Frameworkless\UserInterface\Web\Action\Api\v1;
+namespace Frameworkless\UserInterface\Web\Action\Api\V1;
 
 use Frameworkless\UserInterface\Web\HandlesGetRequest;
-use Frameworkless\UserInterface\Web\HttpUtilities;
+use Frameworkless\UserInterface\Web\Helpers\ResponseFactory;
 use Frameworkless\UserInterface\Web\Middleware\JwtAuthMiddleware;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -19,7 +19,7 @@ class HelloAction implements HandlesGetRequest
 {
     public function getMethod(ServerRequestInterface $request): ResponseInterface
     {
-        return HttpUtilities::jsonResponse(
+        return ResponseFactory::jsonResponse(
             [
                 'hello'   => 'world',
                 'user_id' => JwtAuthMiddleware::getUserId($request),

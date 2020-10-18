@@ -9,3 +9,4 @@ phpstan.log
 /node_modules
 /tools
 /.phive
+/var/log/*

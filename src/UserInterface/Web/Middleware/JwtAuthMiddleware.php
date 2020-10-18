@@ -11,8 +11,8 @@ namespace Frameworkless\UserInterface\Web\Middleware;
 
 use Firebase\JWT\JWT;
 use Frameworkless\Environment;
+use Frameworkless\UserInterface\Web\Helpers\HttpUtilities;
 use Frameworkless\UserInterface\Web\HttpException;
-use Frameworkless\UserInterface\Web\HttpUtilities;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -46,7 +46,7 @@ class JwtAuthMiddleware implements MiddlewareInterface
             $userId  = intval($payload['sub'] ?? 0);
             return $handler->handle($request->withAttribute(self::USER_ID, $userId));
         } catch (\Throwable $ex) {
-            throw new HttpException(self::NOT_LOGGED_IN, HttpUtilities::STATUS_UNAUTHORIZED, $ex);
+            throw new HttpException(self::NOT_LOGGED_IN, HttpUtilities::STATUS_UNAUTHORIZED, [], $ex);
         }
     }
 
@@ -68,7 +68,7 @@ class JwtAuthMiddleware implements MiddlewareInterface
     {
         // Check for token in header.
         $header = $request->getHeaderLine(self::HEADER);
-        if (!empty($header) && \Safe\preg_match(self::TOKEN_REGEX, $header, $matches)) {
+        if (!empty($header) && \Safe\preg_match(self::TOKEN_REGEX, $header, $matches) > 0) {
             return $matches[1];
         }
 

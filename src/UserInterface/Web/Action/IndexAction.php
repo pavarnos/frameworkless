@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Frameworkless\UserInterface\Web\Action;
 
 use Frameworkless\UserInterface\Web\HandlesGetRequest;
-use Frameworkless\UserInterface\Web\HttpUtilities;
+use Frameworkless\UserInterface\Web\Helpers\ResponseFactory;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -18,6 +18,6 @@ class IndexAction implements HandlesGetRequest
 {
     public function getMethod(ServerRequestInterface $request): ResponseInterface
     {
-        return HttpUtilities::htmlResponse('Hello World');
+        return ResponseFactory::htmlResponse('Hello World');
     }
 }

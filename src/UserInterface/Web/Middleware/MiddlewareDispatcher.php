@@ -7,8 +7,9 @@
 
 declare(strict_types=1);
 
-namespace Frameworkless\UserInterface\Web;
+namespace Frameworkless\UserInterface\Web\Middleware;
 
+use Frameworkless\UserInterface\Web\HttpException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;

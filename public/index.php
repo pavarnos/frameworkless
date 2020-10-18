@@ -10,9 +10,9 @@ declare(strict_types=1);
 require '../vendor/autoload.php';
 
 use Frameworkless\ContainerBuilder;
-use Frameworkless\UserInterface\Web\MiddlewareDispatcher;
-use Nyholm\Psr7Server\ServerRequestCreator;
+use Frameworkless\UserInterface\Web\Middleware\MiddlewareDispatcher;
 use Narrowspark\HttpEmitter\SapiEmitter;
+use Nyholm\Psr7Server\ServerRequestCreator;
 
 $container = (new ContainerBuilder())->build();
 $request   = $container->get(ServerRequestCreator::class)->fromGlobals();

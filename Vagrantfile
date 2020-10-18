@@ -86,7 +86,7 @@ Vagrant.configure(2) do |config|
         fi
 
         # php stuff
-        sudo apt-get install -y php7.4 php7.4-fpm php7.4-cli php7.4-gd php7.4-mysql php7.4-zip php7.4-opcache php7.4-json php7.4-mbstring php7.4-curl php7.4-xml php-common php7.4-common
+        sudo apt-get install -y php7.4 php7.4-fpm php7.4-cli php7.4-apc php7.4-gd php7.4-mysql php7.4-zip php7.4-opcache php7.4-json php7.4-mbstring php7.4-curl php7.4-xml php-common php7.4-common
         sudo phpenmod curl dom
 
         # debug / development tools

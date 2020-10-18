@@ -12,8 +12,8 @@ namespace Frameworkless\UserInterface\Web\Middleware;
 use Frameworkless\Environment;
 use Frameworkless\UserInterface\Web\HandlesGetRequest;
 use Frameworkless\UserInterface\Web\HandlesPostRequest;
+use Frameworkless\UserInterface\Web\Helpers\HttpUtilities;
 use Frameworkless\UserInterface\Web\HttpException;
-use Frameworkless\UserInterface\Web\HttpUtilities;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -54,6 +54,6 @@ class RouteMiddleware implements MiddlewareInterface
         if ($method === HttpUtilities::METHOD_POST && $action instanceof HandlesPostRequest) {
             return $action->postMethod($request);
         }
-        throw new HttpException($method . ' not allowed', HttpUtilities::STATUS_NOT_FOUND);
+        throw new HttpException('No such method on route', HttpUtilities::STATUS_NOT_FOUND);
     }
 }

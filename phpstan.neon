@@ -9,12 +9,6 @@ parameters:
         # too strict: we don't care
         - '#Construct empty\(\) is not allowed. Use more strict comparison#'
         - '#Short ternary operator is not allowed#'
-        - '#Call to function in_array\(\) requires parameter .* to be set#'
-        - '#Call to function array_search\(\) requires parameter#'
-        - '#Call to function assert\(\) with bool#'
-        - '#Variable method call on#'
-        # problems with reactphp
-        - '#class React\\Promise\\PromiseInterface is not generic#'
         # problems with Safe
         - '#Function define is unsafe to use#'
 

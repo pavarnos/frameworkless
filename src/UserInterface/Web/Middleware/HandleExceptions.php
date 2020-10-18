@@ -9,7 +9,9 @@ declare(strict_types=1);
 
 namespace Frameworkless\UserInterface\Web\Middleware;
 
-use Frameworkless\UserInterface\Web\HttpUtilities;
+use Frameworkless\UserInterface\Web\Helpers\HttpUtilities;
+use Frameworkless\UserInterface\Web\Helpers\ResponseFactory;
+use Frameworkless\UserInterface\Web\HttpException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -38,9 +40,18 @@ class HandleExceptions implements MiddlewareInterface
             try {
                 $this->logger->error($exception->getMessage(), ['trace' => $exception->getTraceAsString()]);
             } catch (\PDOException $ex) {
-                // have to ignore it: unrecoverable
+                // database error logging the exception: have to ignore it: unrecoverable
             }
-            return HttpUtilities::errorResponse($request, $exception);
+            return ResponseFactory::errorResponse($request, $this->standardise($exception));
         }
+    }
+
+    private function standardise(\Throwable $exception): HttpException
+    {
+        if ($exception instanceof HttpException) {
+            return $exception;
+        }
+        // wrap unexpected exception in something we can handle
+        return new HttpException($exception->getMessage(), HttpUtilities::STATUS_INTERNAL_SERVER_ERROR, [], $exception);
     }
 }

@@ -11,10 +11,10 @@ namespace Frameworkless;
 
 use Frameworkless\UserInterface\Web\Middleware\HandleExceptions;
 use Frameworkless\UserInterface\Web\Middleware\JwtAuthMiddleware;
-use Frameworkless\UserInterface\Web\Middleware\ParseBodyMiddleware;
+use Frameworkless\UserInterface\Web\Middleware\MiddlewareDispatcher;
+use Frameworkless\UserInterface\Web\Middleware\ParseMiddleware;
 use Frameworkless\UserInterface\Web\Middleware\ProfileMiddleware;
 use Frameworkless\UserInterface\Web\Middleware\RouteMiddleware;
-use Frameworkless\UserInterface\Web\MiddlewareDispatcher;
 use LSS\YAContainer\Container;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogHandler;
@@ -63,7 +63,7 @@ class ContainerBuilder
             fn(LoggerInterface $logger) => (new MiddlewareDispatcher())
                 ->add(new RouteMiddleware($container))
                 ->add(new JwtAuthMiddleware())
-                ->add(new ParseBodyMiddleware())
+                ->add(new ParseMiddleware())
                 ->add(new HandleExceptions($logger))
                 ->add(new ProfileMiddleware())
         );

@@ -21,6 +21,6 @@ class ProfileMiddleware implements MiddlewareInterface
     {
         $now = Carbon::now();
         $response = $handler->handle($request);
-        return $response->withHeader('X-Profile-Milliseconds', $now->diffInMilliseconds());
+        return $response->withHeader('X-Profile-Milliseconds', (string) $now->diffInMilliseconds());
     }
 }
