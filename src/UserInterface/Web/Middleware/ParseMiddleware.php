@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Frameworkless\UserInterface\Web\Middleware;
 
 use Frameworkless\UserInterface\Web\Helpers\HttpUtilities;
-use Frameworkless\UserInterface\Web\HttpException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -43,19 +42,14 @@ class ParseMiddleware implements MiddlewareInterface
     public function parseBody(ServerRequestInterface $request): ServerRequestInterface
     {
         $contentType = HttpUtilities::getContentType($request);
-
+        $stream      = $request->getBody();
+        $stream->rewind();
         if ($contentType === HttpUtilities::CONTENT_TYPE_JSON) {
-            $body = $request->getBody();
-            $body->rewind();
-            return $request->withParsedBody(\Safe\json_decode($body->getContents() ?: '[]', true));
+            return $request->withParsedBody(\Safe\json_decode($stream->getContents() ?: '[]', true));
         }
 
         if ($contentType === HttpUtilities::CONTENT_TYPE_URLENCODE) {
-            $body = (string)$request->getBody();
-            parse_str($body, $data);
-            if (strlen($body) > 0 && empty($data)) {
-                throw new HttpException('Invalid url encoded string');
-            }
+            parse_str($stream->getContents(), $data);
             return $request->withParsedBody($data);
         }
 

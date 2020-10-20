@@ -23,8 +23,7 @@ class LoginAction implements HandlesPostRequest
 {
     public function postMethod(ServerRequestInterface $request): ResponseInterface
     {
-        // find the user
-        $body     = (array)$request->getParsedBody();
+        // validate credentials
         $userName = HttpUtilities::getBodyString($request, 'username');
         $password = HttpUtilities::getBodyString($request, 'password');
         if ($userName !== 'foo@example.com' || $password !== 'password') {
@@ -45,9 +44,11 @@ class LoginAction implements HandlesPostRequest
         ];
         return ResponseFactory::jsonResponse(
             [
-                'token'   => JWT::encode($payload, Environment::getAppSecret()),
-                'expires' => $expires,
-                // 'user'    => ['id' => $userId],
+                'token' => [
+                    'value'     => JWT::encode($payload, Environment::getAppSecret()),
+                    'expiresAt' => $expires,
+                    // 'user'    => ['id' => $userId],
+                ],
             ]
         );
     }

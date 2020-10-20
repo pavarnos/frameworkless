@@ -23,15 +23,19 @@ final class HttpUtilities implements StatusCodeInterface, RequestMethodInterface
     public const CONTENT_TYPE_JSON      = 'json';
     public const CONTENT_TYPE_HTML      = 'html';
     public const CONTENT_TYPE_URLENCODE = 'urlencoded';
+    public const CONTENT_TYPE_DEFAULT   = self::CONTENT_TYPE_HTML;
 
-    private const CONTENT_TYPE = [
+    // public for unit tests only
+    public const CONTENT_TYPE = [
         self::CONTENT_TYPE_HTML      => ['text/html', 'application/xhtml+xml'],
         self::CONTENT_TYPE_JSON      => ['application/json', 'text/json', 'application/x-json'],
         self::CONTENT_TYPE_URLENCODE => ['application/x-www-form-urlencoded'],
     ];
 
-    public static function getContentType(ServerRequestInterface $request, string $default = 'html'): string
-    {
+    public static function getContentType(
+        ServerRequestInterface $request,
+        string $default = self::CONTENT_TYPE_DEFAULT
+    ): string {
         // find the first known content type that the caller will Accept
         $accepts = explode(',', strtolower($request->getHeaderLine('Accept')));
         foreach ($accepts as $accept) {
@@ -42,7 +46,7 @@ final class HttpUtilities implements StatusCodeInterface, RequestMethodInterface
                 }
             }
         }
-        $accept = $request->getHeaderLine('Content-Type');
+        $accept = strtolower($request->getHeaderLine('Content-Type'));
         foreach (self::CONTENT_TYPE as $name => $mimeTypes) {
             if (in_array($accept, $mimeTypes, true)) {
                 return $name;
@@ -88,7 +92,11 @@ final class HttpUtilities implements StatusCodeInterface, RequestMethodInterface
 
     public static function sanitiseEmail(string $email): string
     {
-        return trim(filter_var($email, FILTER_SANITIZE_EMAIL) ?: '');
+        $email = trim(filter_var($email, FILTER_SANITIZE_EMAIL) ?: '');
+        if (\Safe\preg_match('|@.+\..+|', $email) <= 0) {
+            return '';
+        }
+        return $email;
     }
 
     /**
@@ -98,13 +106,16 @@ final class HttpUtilities implements StatusCodeInterface, RequestMethodInterface
      */
     public static function sanitiseInteger($taintedValue, int $defaultValue = 0): int
     {
-        if (empty($taintedValue)) {
+        if (is_null($taintedValue)) {
             return $defaultValue;
         }
-        if (\Safe\preg_match('|^([\d]+)|', (string)$taintedValue, $matches) > 0) {
-            $taintedValue = $matches[1] ?? '';
+        if (is_int($taintedValue)) {
+            return $taintedValue;
+        }
+        if (\Safe\preg_match('|^([\d]+)|', $taintedValue, $matches) > 0) {
+            $taintedValue = $matches[1] ?? $defaultValue;
         } else {
-            $taintedValue = '';
+            return $defaultValue;
         }
         return max(0, (int)filter_var($taintedValue, FILTER_SANITIZE_NUMBER_INT));
     }

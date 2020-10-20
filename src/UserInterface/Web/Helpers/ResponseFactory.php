@@ -21,15 +21,14 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 final class ResponseFactory
 {
-    private const MAX_AGE           = 60 * 60 * 24 * 365;
-    private const DEFAULT_MIME_TYPE = 'application/octet-stream';
+    private const MAX_AGE = 60 * 60 * 24 * 365;
 
     public static function htmlResponse(
         string $content,
         int $status = HttpUtilities::STATUS_OK,
         array $headers = []
     ): ResponseInterface {
-        $headers = array_merge(['Content-type' => 'text/html'], $headers);
+        $headers = array_merge(['Content-Type' => 'text/html'], $headers);
         return new Response($status, $headers, $content);
     }
 
@@ -38,7 +37,7 @@ final class ResponseFactory
         int $status = HttpUtilities::STATUS_OK,
         array $headers = []
     ): ResponseInterface {
-        $headers = array_merge(['Content-type' => 'application/json'], $headers);
+        $headers = array_merge(['Content-Type' => 'application/json'], $headers);
         return new Response($status, $headers, \Safe\json_encode($content));
     }
 
@@ -108,6 +107,6 @@ final class ResponseFactory
 
     private static function calculateMimeType(string $path): string
     {
-        return MimeTypeExtensionGuesser::guess(pathinfo($path, PATHINFO_EXTENSION)) ?? self::DEFAULT_MIME_TYPE;
+        return MimeTypeExtensionGuesser::guess(pathinfo($path, PATHINFO_EXTENSION)) ?? 'application/octet-stream';
     }
 }

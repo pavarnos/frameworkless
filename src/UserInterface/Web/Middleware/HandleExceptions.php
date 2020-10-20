@@ -39,8 +39,10 @@ class HandleExceptions implements MiddlewareInterface
         } catch (\Throwable $exception) {
             try {
                 $this->logger->error($exception->getMessage(), ['trace' => $exception->getTraceAsString()]);
+                // @codeCoverageIgnoreStart
             } catch (\PDOException $ex) {
                 // database error logging the exception: have to ignore it: unrecoverable
+                // @codeCoverageIgnoreEnd
             }
             return ResponseFactory::errorResponse($request, $this->standardise($exception));
         }

@@ -14,7 +14,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Frameworkless\\": "test/src/"
+            "Frameworkless\\": "test/"
         }
     },
     "config": {
@@ -26,11 +26,13 @@
         "ext-apcu": "*",
         "ext-json": "*",
         "ext-pdo": "*",
+        "ext-redis": "*",
         "components/jquery": "^3.5",
         "fig/http-message-util": "^1.1",
         "firebase/php-jwt": "^5.2",
         "fortawesome/font-awesome": "^5.13",
-        "lss/yacontainer": "dev-master",
+        "lss/yacontainer": "^1.0",
+        "lss/yacache": "^1.1",
         "monolog/monolog": "^2.1",
         "narrowspark/http-emitter": "^1.0",
         "narrowspark/mimetypes": "^1.6",

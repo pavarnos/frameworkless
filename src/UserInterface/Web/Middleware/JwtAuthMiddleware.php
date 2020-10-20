@@ -23,9 +23,8 @@ class JwtAuthMiddleware implements MiddlewareInterface
     private const BASE_URL = '/api/';
     private const IGNORE   = [self::BASE_URL . 'v1/login'];
 
-    private const HEADER      = 'Authorization';
-    private const TOKEN_REGEX = '/^Bearer\s+(.*)$/i';
-    private const COOKIE      = 'token';
+    private const HEADER = 'Authorization';
+    private const COOKIE = 'token';
 
     public const NOT_LOGGED_IN = 'Not logged in';
     public const USER_ID       = 'user_id';
@@ -67,15 +66,15 @@ class JwtAuthMiddleware implements MiddlewareInterface
     private function fetchToken(ServerRequestInterface $request): string
     {
         // Check for token in header.
-        $header = $request->getHeaderLine(self::HEADER);
-        if (!empty($header) && \Safe\preg_match(self::TOKEN_REGEX, $header, $matches) > 0) {
-            return $matches[1];
+        $token = trim(str_replace('Bearer', '', $request->getHeaderLine(self::HEADER)));
+        if (!empty($token)) {
+            return $token;
         }
 
         // Token not found in header try a cookie.
-        $cookieParams = $request->getCookieParams();
-        if (!empty($cookieParams[self::COOKIE])) {
-            return $cookieParams[self::COOKIE];
+        $cookie = $request->getCookieParams()[self::COOKIE] ?? '';
+        if (!empty($cookie)) {
+            return $cookie;
         };
         throw new HttpException(self::NOT_LOGGED_IN, HttpUtilities::STATUS_UNAUTHORIZED);
     }

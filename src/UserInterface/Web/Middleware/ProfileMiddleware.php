@@ -17,10 +17,12 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class ProfileMiddleware implements MiddlewareInterface
 {
+    public const HEADER = 'X-Profile-Milliseconds';
+
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $now = Carbon::now();
         $response = $handler->handle($request);
-        return $response->withHeader('X-Profile-Milliseconds', (string) $now->diffInMilliseconds());
+        return $response->withHeader(self::HEADER, (string) $now->diffInMilliseconds());
     }
 }

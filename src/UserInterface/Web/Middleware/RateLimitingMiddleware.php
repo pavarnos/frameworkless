@@ -11,9 +11,9 @@ namespace Frameworkless\UserInterface\Web\Middleware;
 
 use Carbon\Carbon;
 use Fig\Http\Message\StatusCodeInterface;
-use Frameworkless\Service\Cache\APCCache;
-use Frameworkless\Service\Cache\CacheInterface;
 use Frameworkless\UserInterface\Web\HttpException;
+use LSS\YACache\APCCache;
+use LSS\YACache\CacheInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;

@@ -11,9 +11,8 @@ namespace Frameworkless\UserInterface\Web\Middleware;
 
 use Carbon\Carbon;
 use Fig\Http\Message\RequestMethodInterface;
-use Frameworkless\Service\Cache\APCCache;
-use Frameworkless\Service\Cache\MemoryCache;
 use Frameworkless\UserInterface\Web\HttpException;
+use LSS\YACache\MemoryCache;
 use Nyholm\Psr7\ServerRequest;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
@@ -73,7 +72,7 @@ class RateLimitingMiddlewareTest extends TestCase
 
     public function testDifferentIP(): void
     {
-        $subject = new RateLimitingMiddleware(new APCCache());
+        $subject = new RateLimitingMiddleware(new MemoryCache());
         $this->getResponse($subject);
         $this->getResponse($subject);
         $this->getResponse($subject);
@@ -96,7 +95,6 @@ class RateLimitingMiddlewareTest extends TestCase
 
     protected function tearDown(): void
     {
-        (new APCCache())->clear();
         Carbon::setTestNow();
         $_SERVER = $this->server;
         parent::tearDown();

@@ -21,6 +21,8 @@ use Safe\Exceptions\JsonException;
 
 class ParseMiddlewareTest extends TestCase
 {
+    use DispatcherFakerTrait;
+
     private ResponseInterface $response;
 
     public function testUnchanged(): void
@@ -38,6 +40,28 @@ class ParseMiddlewareTest extends TestCase
         self::assertEquals($this->response, $response);
     }
 
+    public function testAlreadyParsed(): void
+    {
+        $request  = new ServerRequest(HttpUtilities::METHOD_POST, 'http://foo.bar');
+        $request  = $request->withParsedBody($content = ['some content']);
+        $handler  = new class($content) implements RequestHandlerInterface {
+            private array $data;
+
+            public function __construct(array $data)
+            {
+                $this->data = $data;
+            }
+
+            public function handle(ServerRequestInterface $request): ResponseInterface
+            {
+                TestCase::assertEquals($this->data, $request->getParsedBody());
+                return new Response();
+            }
+        };
+        $response = (new ParseMiddleware())->process($request, $handler);
+        self::assertEquals($this->response, $response);
+    }
+
     public function testQueryParams(): void
     {
         $request  = new ServerRequest(HttpUtilities::METHOD_GET, 'http://foo.bar?a=1&b=23&c=info@example.com');
@@ -47,6 +71,27 @@ class ParseMiddlewareTest extends TestCase
                 TestCase::assertEquals('1', HttpUtilities::getQueryString($request, 'a'));
                 TestCase::assertEquals(23, HttpUtilities::getQueryInteger($request, 'b'));
                 TestCase::assertEquals('info@example.com', HttpUtilities::getQueryEmail($request, 'c'));
+                return new Response();
+            }
+        };
+        $response = (new ParseMiddleware())->process($request, $handler);
+        self::assertEquals($this->response, $response);
+    }
+
+    public function testUrlEncode(): void
+    {
+        $request  = new ServerRequest(
+            HttpUtilities::METHOD_POST,
+            'http://foo.bar',
+            ['Content-Type' => 'application/x-www-form-urlencoded'],
+            'a=1&b=23&c=info@example.com'
+        );
+        $handler  = new class implements RequestHandlerInterface {
+            public function handle(ServerRequestInterface $request): ResponseInterface
+            {
+                TestCase::assertEquals('1', HttpUtilities::getBodyString($request, 'a'));
+                TestCase::assertEquals(23, HttpUtilities::getBodyInteger($request, 'b'));
+                TestCase::assertEquals('info@example.com', HttpUtilities::getBodyEmail($request, 'c'));
                 return new Response();
             }
         };
