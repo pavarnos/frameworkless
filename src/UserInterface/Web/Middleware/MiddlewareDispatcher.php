@@ -38,7 +38,6 @@ class MiddlewareDispatcher implements RequestHandlerInterface
             throw new HttpException(self::ERROR_MESSAGE);
         }
         $middleware = array_pop($this->middleware);
-//        assert(!is_null($middleware)); // for phpstan
         return $middleware->process($request, $this);
     }
 }
