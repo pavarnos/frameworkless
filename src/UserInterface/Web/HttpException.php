@@ -9,9 +9,10 @@ declare(strict_types=1);
 
 namespace Frameworkless\UserInterface\Web;
 
+use Frameworkless\AppException;
 use Throwable;
 
-class HttpException extends \RuntimeException
+class HttpException extends AppException
 {
     private array $headers = [];
 

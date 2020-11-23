@@ -35,7 +35,6 @@ class RouteMiddlewareTest extends TestCase
         self::assertEquals(IndexAction::class, RouteMiddleware::uriToClassName(''));
         self::assertEquals(IndexAction::class, RouteMiddleware::uriToClassName('/'));
         self::assertEquals(IndexAction::class, RouteMiddleware::uriToClassName('/index'));
-
         self::assertEquals(LoginAction::class, RouteMiddleware::uriToClassName('/api/v1/login'));
     }
 

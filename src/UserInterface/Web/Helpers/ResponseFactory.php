@@ -95,13 +95,13 @@ final class ResponseFactory
     {
         $contentType                    = self::calculateMimeType($diskPath);
         $headers                        = [];
-        $headers['Expires']             = gmdate('r', time() + self::MAX_AGE);
+        $headers['Expires']             = \Safe\gmdate('r', time() + self::MAX_AGE);
         $headers['Content-Description'] = 'File Transfer';
         $headers['Content-Type']        = $contentType;
         $headers['Content-Disposition'] = 'attachment; filename="' . basename($diskPath) . '"';
         $headers['Cache-Control']       = 'max-age=' . self::MAX_AGE;
         $headers['Content-Length']      = \Safe\filesize($diskPath);
-        $headers['Last-Modified']       = gmdate('r', \Safe\filemtime($diskPath));
+        $headers['Last-Modified']       = \Safe\gmdate('r', \Safe\filemtime($diskPath));
         return new Response(HttpUtilities::STATUS_OK, $headers, \Safe\fopen($diskPath, 'r'));
     }
 
